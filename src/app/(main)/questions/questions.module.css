@@ -1,0 +1,72 @@
+.questionCardLink {
+  text-decoration: none;
+  display: block;
+}
+
+.questionCard {
+  padding: var(--space-5);
+  transition: all var(--transition-base);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.questionCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-border-accent);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+}
+
+.questionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.pointsBadge {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gold);
+  background: var(--color-gold-muted);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+}
+
+.questionTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-6);
+  flex-grow: 1;
+}
+
+.questionFooter {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-4);
+  margin-top: auto;
+}
+
+.answerStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.statusIcon {
+  font-size: 1.1em;
+}
+
+.statusText {
+  color: var(--color-success);
+}
+
+.statusIconError {
+  font-size: 1.1em;
+}
+
+.statusTextError {
+  color: var(--color-warning);
+}
