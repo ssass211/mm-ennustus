@@ -1,0 +1,73 @@
+.groupCard {
+  padding: 0;
+  overflow: hidden;
+}
+
+.groupTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  padding: var(--space-4);
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.groupTable {
+  margin: 0;
+}
+
+.groupTable th {
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.7rem;
+}
+
+.groupTable td {
+  padding: var(--space-3);
+}
+
+.teamCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.teamName {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.rankCell {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.pointsCell {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent);
+  font-size: var(--font-size-base);
+}
+
+/* Qualification highlighting */
+.qualifiedTeam {
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.qualifiedTeam .rankCell {
+  color: var(--color-success);
+}
+
+.potentialTeam {
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.potentialTeam .rankCell {
+  color: var(--color-info);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .teamName {
+    font-size: var(--font-size-sm);
+  }
+}
