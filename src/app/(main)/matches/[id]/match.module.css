@@ -1,0 +1,245 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-bottom: var(--space-10);
+}
+
+.backLink {
+  display: inline-block;
+  margin-bottom: var(--space-4);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  transition: color var(--transition-fast);
+}
+
+.backLink:hover {
+  color: var(--color-text-primary);
+}
+
+/* Match Header info */
+.matchDetailCard {
+  margin-bottom: var(--space-8);
+  padding: var(--space-8);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.matchMeta {
+  margin-bottom: var(--space-8);
+}
+
+.matchStage {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-2);
+}
+
+.matchTime {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.matchVenue {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* Score Board */
+.scoreBoard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+}
+
+.team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+}
+
+.flagLg {
+  font-size: 4rem;
+  line-height: 1;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+}
+
+.flagSm {
+  font-size: 1.5rem;
+}
+
+.teamName {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.actualScore {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 120px;
+  justify-content: center;
+}
+
+.scoreNumber {
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-text-primary);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  background: var(--color-surface-200);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+}
+
+.scoreDivider {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+}
+
+.vsText {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-bold);
+  padding: var(--space-4);
+  background: var(--color-surface-200);
+  border-radius: var(--radius-full);
+}
+
+/* Prediction Section */
+.predictionSection {
+  margin-bottom: var(--space-8);
+}
+
+.predictionCard {
+  padding: var(--space-6);
+  text-align: center;
+}
+
+.lockedAlert {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--color-warning);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-6);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.predictionForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.inputsWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.inputGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.inputsDivider {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+}
+
+/* Points Earned */
+.pointsEarned {
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px dashed var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pointsLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pointsValue {
+  font-size: var(--font-size-lg);
+  padding: var(--space-2) var(--space-4);
+}
+
+/* Others Section */
+.othersList {
+  display: flex;
+  flex-direction: column;
+}
+
+.otherPrediction {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.otherPrediction:last-child {
+  border-bottom: none;
+}
+
+.otherUser {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-weight: var(--font-weight-medium);
+}
+
+.otherScore {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.otherScoreValue {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.1em;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .scoreBoard {
+    gap: var(--space-4);
+  }
+  
+  .flagLg {
+    font-size: 3rem;
+  }
+  
+  .scoreNumber {
+    font-size: var(--font-size-3xl);
+    padding: var(--space-1) var(--space-2);
+  }
+  
+  .inputsWrapper {
+    gap: var(--space-2);
+  }
+}
