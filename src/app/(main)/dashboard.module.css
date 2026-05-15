@@ -1,0 +1,208 @@
+/* Dashboard Styles */
+
+.skeletonHeader {
+  margin-bottom: var(--space-8);
+}
+
+/* Welcome */
+.welcomeSection {
+  margin-bottom: var(--space-8);
+  animation: fadeIn 0.5s ease;
+}
+
+.welcomeTitle {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-extrabold);
+  margin-bottom: var(--space-2);
+}
+
+.welcomeSubtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+}
+
+/* Countdown */
+.countdownCard {
+  background: linear-gradient(135deg, rgba(0, 255, 135, 0.08), rgba(0, 100, 255, 0.05));
+  border: 1px solid var(--color-border-accent);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8);
+  margin-bottom: var(--space-8);
+  text-align: center;
+  animation: fadeIn 0.5s ease 0.1s backwards;
+}
+
+.countdownTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-4);
+}
+
+/* Stats Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-10);
+  animation: fadeIn 0.5s ease 0.2s backwards;
+}
+
+.statCard {
+  text-align: center;
+  padding: var(--space-6);
+}
+
+.statIcon {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-2);
+}
+
+.statValue {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: var(--space-1);
+}
+
+/* Quick Links */
+.quickLinksSection {
+  margin-bottom: var(--space-10);
+  animation: fadeIn 0.5s ease 0.3s backwards;
+}
+
+.quickLinksGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+.quickLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  text-decoration: none;
+  color: var(--color-text-primary);
+  transition: all var(--transition-base);
+}
+
+.quickLink:hover {
+  background: var(--color-bg-card-hover);
+  border-color: var(--color-border-accent);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+
+.quickLinkIcon {
+  font-size: 1.5rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent-muted);
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+}
+
+.quickLinkText {
+  flex: 1;
+  min-width: 0;
+}
+
+.quickLinkTitle {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+}
+
+.quickLinkDesc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.quickLinkArrow {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xl);
+  transition: transform var(--transition-fast);
+}
+
+.quickLink:hover .quickLinkArrow {
+  transform: translateX(4px);
+  color: var(--color-accent);
+}
+
+/* Scoring Section */
+.scoringSection {
+  animation: fadeIn 0.5s ease 0.4s backwards;
+}
+
+.scoringCard {
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.scoringRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--transition-fast);
+}
+
+.scoringRow:last-child {
+  border-bottom: none;
+}
+
+.scoringRow:hover {
+  background: var(--color-surface-200);
+}
+
+.scoringBadge {
+  font-size: 1.25rem;
+  width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.scoringDesc {
+  flex: 1;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.scoringPoints {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-sm);
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .quickLinksGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .countdownCard {
+    padding: var(--space-6);
+  }
+}
