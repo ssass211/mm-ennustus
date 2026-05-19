@@ -5,7 +5,7 @@ import { calculateMatchPoints } from '@/lib/scoring';
 import { revalidatePath } from 'next/cache';
 
 export async function confirmMatchResultAndCalculatePoints(matchId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // 1. Check if user is admin
   const { data: { user } } = await supabase.auth.getUser();

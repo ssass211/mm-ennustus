@@ -142,7 +142,7 @@ export default function GroupsPage() {
                           <td className="text-center hide-mobile text-muted">{groupTeam.drawn}</td>
                           <td className="text-center hide-mobile text-muted">{groupTeam.lost}</td>
                           <td className="text-center">
-                            {groupTeam.goal_difference > 0 ? `+${groupTeam.goal_difference}` : groupTeam.goal_difference}
+                            {(groupTeam.goal_difference ?? 0) > 0 ? `+${groupTeam.goal_difference ?? 0}` : (groupTeam.goal_difference ?? 0)}
                           </td>
                           <td className={`text-center ${styles.pointsCell}`}>
                             {groupTeam.points}
