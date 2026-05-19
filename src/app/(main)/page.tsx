@@ -25,6 +25,7 @@ export default function DashboardPage() {
     rank: '-',
   });
   const [loading, setLoading] = useState(true);
+  const [showLeagueManager, setShowLeagueManager] = useState(false);
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -147,7 +148,20 @@ export default function DashboardPage() {
                 {lm.leagues.name}
               </button>
             ))}
+            <button
+              className="badge badge-outline cursor-pointer hover:bg-surface-200"
+              onClick={() => setShowLeagueManager(!showLeagueManager)}
+              style={{ padding: '8px 16px', fontSize: '1rem', borderStyle: 'dashed', borderColor: 'var(--text-muted)' }}
+            >
+              + Lisa liiga
+            </button>
           </div>
+
+          {(showLeagueManager) && (
+            <div className="mb-8">
+              <LeagueManager />
+            </div>
+          )}
 
           <div className={styles.statsGrid}>
             <Link href="/leaderboard" className={`glass-card ${styles.statCard} hover:bg-surface-200 transition-colors`}>
