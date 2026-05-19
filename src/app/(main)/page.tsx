@@ -141,9 +141,13 @@ export default function DashboardPage() {
             {userLeagues.map(lm => (
               <button 
                 key={lm.league_id} 
-                className={`badge ${activeLeague?.id === lm.league_id ? 'bg-primary text-white font-bold' : 'badge-outline cursor-pointer hover:bg-surface-200'}`}
+                className={`badge ${activeLeague?.id === lm.league_id ? 'badge-primary' : 'badge-outline cursor-pointer hover:bg-surface-200'}`}
                 onClick={() => setActiveLeague(lm.leagues as any)}
-                style={{ padding: '8px 16px', fontSize: '1rem' }}
+                style={{ 
+                  padding: '8px 16px', 
+                  fontSize: '1rem',
+                  ...(activeLeague?.id === lm.league_id ? { transform: 'scale(1.05)', boxShadow: '0 0 10px rgba(0,255,135,0.4)', fontWeight: 'bold' } : {})
+                }}
               >
                 {lm.leagues.name}
               </button>

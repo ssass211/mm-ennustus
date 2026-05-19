@@ -22,7 +22,6 @@ export default function Header({ user, onLogout }: HeaderProps) {
   const { activeLeague, setActiveLeague, userLeagues } = useLeague();
 
   const navItems = [
-    { href: '/', label: t('nav.dashboard'), icon: '🏠' },
     { href: '/matches', label: t('nav.matches'), icon: '⚽' },
     { href: '/groups', label: t('nav.groups'), icon: '📋' },
     { href: '/questions', label: t('nav.questions'), icon: '❓' },
