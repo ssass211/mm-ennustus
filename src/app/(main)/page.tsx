@@ -155,6 +155,15 @@ export default function DashboardPage() {
             >
               + Lisa liiga
             </button>
+            {userLeagues.find(lm => lm.league_id === activeLeague?.id)?.role === 'admin' && (
+              <Link
+                href={`/leagues/${activeLeague!.id}/admin`}
+                className="badge badge-outline cursor-pointer hover:bg-surface-200"
+                style={{ padding: '8px 16px', fontSize: '1rem', borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
+              >
+                ⚙️ Liiga seaded
+              </Link>
+            )}
           </div>
 
           {(showLeagueManager) && (
