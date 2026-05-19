@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useI18n } from '@/lib/i18n';
+import { useLeague } from '@/lib/LeagueContext';
+import LeagueManager from '@/components/leagues/LeagueManager';
+import { getFlagUrl } from '@/lib/flags';
 import styles from './dashboard.module.css';
 import type { MatchWithTeams, LeaderboardEntry } from '@/lib/types';
 
@@ -12,8 +15,9 @@ export default function DashboardPage() {
   const supabase = createClient();
 
   const [userName, setUserName] = useState('');
-  const [upcomingMatches, setUpcomingMatches] = useState<MatchWithTeams[]>([]);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [upcomingMatches, setUpcomingMatches] = useState<any[]>([]);
+  const { activeLeague, setActiveLeague, userLeagues } = useLeague();
   const [stats, setStats] = useState({
     totalPoints: 0,
     predictions: 0,
@@ -24,22 +28,51 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchDashboard = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
 
       if (user) {
-        setUserName(
-          user.user_metadata?.display_name || user.email?.split('@')[0] || ''
-        );
+        setUserId(user.id);
+        setUserName(user.user_metadata?.display_name || user.email?.split('@')[0] || '');
+
+        if (activeLeague) {
+          const { data: lbData } = await supabase.rpc('get_league_leaderboard', { p_league_id: activeLeague.id });
+          if (lbData) {
+            const sortedData = [...lbData].sort((a, b) => {
+              if (b.total_points !== a.total_points) return b.total_points - a.total_points;
+              return b.exact_scores - a.exact_scores;
+            });
+            const userEntryIndex = sortedData.findIndex((u: any) => u.user_id === user.id);
+            const userEntry = sortedData[userEntryIndex];
+            
+            if (userEntry) {
+              setStats({
+                totalPoints: userEntry.total_points,
+                predictions: userEntry.predictions_count,
+                exactScores: userEntry.exact_scores,
+                rank: (userEntryIndex + 1).toString(),
+              });
+            } else {
+              setStats({ totalPoints: 0, predictions: 0, exactScores: 0, rank: '-' });
+            }
+          }
+        }
       }
 
-      // For now, set placeholder data until database is set up
+      // Fetch upcoming matches
+      const { data: upcoming } = await supabase
+        .from('matches')
+        .select('*, home_team:teams!home_team_id(*), away_team:teams!away_team_id(*)')
+        .eq('status', 'scheduled')
+        .order('match_datetime', { ascending: true })
+        .limit(3);
+        
+      if (upcoming) setUpcomingMatches(upcoming);
+
       setLoading(false);
     };
 
     fetchDashboard();
-  }, [supabase]);
+  }, [supabase, activeLeague]);
 
   // Tournament countdown
   const tournamentStart = new Date('2026-06-11T00:00:00Z');
@@ -96,52 +129,108 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Tournament Countdown */}
-      <div className={styles.countdownCard}>
-        <div className={styles.countdownTitle}>⚽ Turniiri alguseni</div>
-        <div className="countdown">
-          <div className="countdown-item">
-            <div className="countdown-value">{countdown.days}</div>
-            <div className="countdown-unit">{t('time.days')}</div>
-          </div>
-          <div className="countdown-item">
-            <div className="countdown-value">{String(countdown.hours).padStart(2, '0')}</div>
-            <div className="countdown-unit">{t('time.hours')}</div>
-          </div>
-          <div className="countdown-item">
-            <div className="countdown-value">{String(countdown.minutes).padStart(2, '0')}</div>
-            <div className="countdown-unit">{t('time.minutes')}</div>
-          </div>
-          <div className="countdown-item">
-            <div className="countdown-value">{String(countdown.seconds).padStart(2, '0')}</div>
-            <div className="countdown-unit">{t('time.seconds')}</div>
-          </div>
+      {userLeagues.length === 0 ? (
+        <div className="mb-8">
+          <LeagueManager />
         </div>
-      </div>
+      ) : (
+        <>
+          <div className="mb-6 flex gap-2 flex-wrap items-center">
+            <span className="text-sm font-semibold text-muted mr-2">Aktiivne liiga:</span>
+            {userLeagues.map(lm => (
+              <button 
+                key={lm.league_id} 
+                className={`badge ${activeLeague?.id === lm.league_id ? 'badge-primary' : 'badge-outline cursor-pointer hover:bg-surface-200'}`}
+                onClick={() => setActiveLeague(lm.leagues as any)}
+                style={{ padding: '8px 16px', fontSize: '1rem' }}
+              >
+                {lm.leagues.name}
+              </button>
+            ))}
+          </div>
 
-      {/* Quick Stats */}
-      <div className={styles.statsGrid}>
-        <div className={`glass-card ${styles.statCard}`}>
-          <div className={styles.statIcon}>🏆</div>
-          <div className={styles.statValue}>{stats.totalPoints}</div>
-          <div className={styles.statLabel}>{t('dashboard.totalPoints')}</div>
+          <div className={styles.statsGrid}>
+            <Link href="/leaderboard" className={`glass-card ${styles.statCard} hover:bg-surface-200 transition-colors`}>
+              <div className={styles.statIcon}>🏆</div>
+              <div className={styles.statValue}>{stats.totalPoints}</div>
+              <div className={styles.statLabel}>{t('dashboard.totalPoints')}</div>
+            </Link>
+            <Link href="/matches" className={`glass-card ${styles.statCard} hover:bg-surface-200 transition-colors`}>
+              <div className={styles.statIcon}>📝</div>
+              <div className={styles.statValue}>{stats.predictions}</div>
+              <div className={styles.statLabel}>{t('dashboard.predictions')}</div>
+            </Link>
+            <Link href="/matches" className={`glass-card ${styles.statCard} hover:bg-surface-200 transition-colors`}>
+              <div className={styles.statIcon}>🎯</div>
+              <div className={styles.statValue}>{stats.exactScores}</div>
+              <div className={styles.statLabel}>{t('dashboard.exactScores')}</div>
+            </Link>
+            <Link href="/leaderboard" className={`glass-card ${styles.statCard} hover:bg-surface-200 transition-colors`}>
+              <div className={styles.statIcon}>📊</div>
+              <div className={styles.statValue}>{stats.rank}</div>
+              <div className={styles.statLabel}>{t('dashboard.rank')}</div>
+            </Link>
+          </div>
+        </>
+      )}
+
+      {/* Tournament Countdown or Upcoming Matches */}
+      {countdown.days > 0 || countdown.hours > 0 || countdown.minutes > 0 || countdown.seconds > 0 ? (
+        <div className={styles.countdownCard}>
+          <div className={styles.countdownTitle}>⚽ Turniiri alguseni</div>
+          <div className="countdown">
+            <div className="countdown-item">
+              <div className="countdown-value">{countdown.days}</div>
+              <div className="countdown-unit">{t('time.days')}</div>
+            </div>
+            <div className="countdown-item">
+              <div className="countdown-value">{String(countdown.hours).padStart(2, '0')}</div>
+              <div className="countdown-unit">{t('time.hours')}</div>
+            </div>
+            <div className="countdown-item">
+              <div className="countdown-value">{String(countdown.minutes).padStart(2, '0')}</div>
+              <div className="countdown-unit">{t('time.minutes')}</div>
+            </div>
+            <div className="countdown-item">
+              <div className="countdown-value">{String(countdown.seconds).padStart(2, '0')}</div>
+              <div className="countdown-unit">{t('time.seconds')}</div>
+            </div>
+          </div>
         </div>
-        <div className={`glass-card ${styles.statCard}`}>
-          <div className={styles.statIcon}>📝</div>
-          <div className={styles.statValue}>{stats.predictions}</div>
-          <div className={styles.statLabel}>{t('dashboard.predictions')}</div>
+      ) : (
+        <div className="mb-10">
+          <h2 className="section-title">📅 Järgmised mängud</h2>
+          <div className="grid grid-3">
+            {upcomingMatches.map(match => (
+              <Link key={match.id} href={`/matches/${match.id}`} className="glass-card hover:bg-surface-200 transition-colors" style={{ padding: 'var(--space-4)' }}>
+                <div className="text-sm text-muted text-center mb-4">
+                  {new Date(match.match_datetime).toLocaleDateString('et-EE', { weekday: 'short', day: 'numeric', month: 'short' })} • {new Date(match.match_datetime).toLocaleTimeString('et-EE', { hour: '2-digit', minute: '2-digit' })}
+                </div>
+                <div className="flex justify-between items-center px-4">
+                  <div className="text-center flex-1">
+                    {getFlagUrl(match.home_team.code) ? (
+                      <img src={getFlagUrl(match.home_team.code)!} alt="" className="mx-auto" style={{ width: 40, height: 'auto', borderRadius: 4, marginBottom: 8 }} />
+                    ) : (
+                      <div className="text-2xl mb-2">{match.home_team.flag_emoji}</div>
+                    )}
+                    <div className="font-bold text-sm">{match.home_team.code}</div>
+                  </div>
+                  <div className="text-muted font-bold px-2">VS</div>
+                  <div className="text-center flex-1">
+                    {getFlagUrl(match.away_team.code) ? (
+                      <img src={getFlagUrl(match.away_team.code)!} alt="" className="mx-auto" style={{ width: 40, height: 'auto', borderRadius: 4, marginBottom: 8 }} />
+                    ) : (
+                      <div className="text-2xl mb-2">{match.away_team.flag_emoji}</div>
+                    )}
+                    <div className="font-bold text-sm">{match.away_team.code}</div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+            {upcomingMatches.length === 0 && <div className="text-muted">Mänge ei leitud.</div>}
+          </div>
         </div>
-        <div className={`glass-card ${styles.statCard}`}>
-          <div className={styles.statIcon}>🎯</div>
-          <div className={styles.statValue}>{stats.exactScores}</div>
-          <div className={styles.statLabel}>{t('dashboard.exactScores')}</div>
-        </div>
-        <div className={`glass-card ${styles.statCard}`}>
-          <div className={styles.statIcon}>📊</div>
-          <div className={styles.statValue}>{stats.rank}</div>
-          <div className={styles.statLabel}>{t('dashboard.rank')}</div>
-        </div>
-      </div>
+      )}
 
       {/* Quick Links */}
       <div className={styles.quickLinksSection}>

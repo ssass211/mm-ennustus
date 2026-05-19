@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useI18n } from '@/lib/i18n';
 import styles from '../admin.module.css';
+import { confirmMatchResultAndCalculatePoints } from '../actions';
 
 export default function AdminMatchesPage() {
   const supabase = createClient();
@@ -69,6 +70,19 @@ export default function AdminMatchesPage() {
     if (!isNaN(home) && !isNaN(away)) {
       handleUpdateScore(matchId, home, away, status);
     }
+  };
+
+  const handleConfirmResult = async (matchId: string) => {
+    setActionLoading(matchId + '-confirm');
+    setMessage(null);
+    const res = await confirmMatchResultAndCalculatePoints(matchId);
+    if (res.success) {
+      setMessage({ type: 'success', text: 'Tulemus kinnitatud ja punktid arvutatud!' });
+      setMatches(matches.map(m => m.id === matchId ? { ...m, is_result_confirmed: true } : m));
+    } else {
+      setMessage({ type: 'error', text: 'Viga: ' + res.error });
+    }
+    setActionLoading(null);
   };
 
   if (loading) {
@@ -162,9 +176,10 @@ export default function AdminMatchesPage() {
                     {match.status === 'finished' && !match.is_result_confirmed && (
                       <button 
                         className="btn btn-sm badge-success ml-2" 
-                        onClick={() => alert('Kinnitamine ja punktide arvutamine tuleb eraldi tööriistana.')}
+                        onClick={() => handleConfirmResult(match.id)}
+                        disabled={actionLoading === match.id + '-confirm'}
                       >
-                        Kinnita tulemus
+                        {actionLoading === match.id + '-confirm' ? 'Kinnitan...' : 'Kinnita tulemus'}
                       </button>
                     )}
                     {match.is_result_confirmed && (

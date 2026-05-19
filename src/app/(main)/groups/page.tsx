@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useI18n } from '@/lib/i18n';
 import type { GroupWithTeams } from '@/lib/types';
+import { getFlagUrl } from '@/lib/flags';
 import styles from './groups.module.css';
 
 export default function GroupsPage() {
@@ -15,45 +16,46 @@ export default function GroupsPage() {
 
   useEffect(() => {
     const fetchGroups = async () => {
-      // Fetch groups and their teams
-      const { data, error } = await supabase
+      // Fetch groups
+      const { data: groupsData, error: groupsError } = await supabase
         .from('groups')
-        .select(`
-          *,
-          teams:group_teams(
-            *,
-            team:teams(*)
-          )
-        `)
+        .select('*')
         .order('sort_order', { ascending: true });
 
-      if (error || !data) {
-        console.error(error);
+      // Fetch standings with team details
+      const { data: standingsData, error: standingsError } = await supabase
+        .from('group_standings')
+        .select(`
+          *,
+          team:teams(*)
+        `);
+
+      if (groupsError || standingsError || !groupsData || !standingsData) {
+        console.error('Error fetching groups data:', groupsError || standingsError);
         setLoading(false);
         return;
       }
 
-      // Format data and calculate standings (mock for now, as real calculation requires matches data)
-      // In a real app, you would join with matches and calculate points, or use a SQL view for standings
-      const formattedGroups: GroupWithTeams[] = data.map((group) => {
-        const teams = group.teams.map((gt: any) => ({
-          ...gt,
-          // Placeholder stats if not calculated in DB
-          played: gt.played || 0,
-          won: gt.won || 0,
-          drawn: gt.drawn || 0,
-          lost: gt.lost || 0,
-          goals_for: gt.goals_for || 0,
-          goals_against: gt.goals_against || 0,
-          goal_difference: (gt.goals_for || 0) - (gt.goals_against || 0),
-          points: (gt.won || 0) * 3 + (gt.drawn || 0) * 1,
-        }));
+      // Format data and calculate standings
+      const formattedGroups: GroupWithTeams[] = groupsData.map((group) => {
+        // Find all standings for this group
+        const teams = standingsData
+          .filter((st) => st.group_id === group.id)
+          .map((st: any) => ({
+            ...st,
+            id: `${group.id}-${st.team_id}`, // Generate a unique ID for the list key
+          }));
 
-        // Sort teams by points, then goal difference, then goals scored
+        // Sort teams by FIFA Official Rules:
+        // 1. Points
+        // 2. Goal Difference
+        // 3. Goals For
+        // 4. Manual Tiebreaker (Admin override for Fair Play / H2H)
         teams.sort((a, b) => {
           if (b.points !== a.points) return b.points - a.points;
           if (b.goal_difference !== a.goal_difference) return b.goal_difference - a.goal_difference;
-          return b.goals_for - a.goals_for;
+          if (b.goals_for !== a.goals_for) return b.goals_for - a.goals_for;
+          return (b.manual_tiebreaker || 0) - (a.manual_tiebreaker || 0);
         });
 
         return {
@@ -67,7 +69,7 @@ export default function GroupsPage() {
     };
 
     fetchGroups();
-  }, [supabase]);
+  }, []);
 
   if (loading) {
     return (
@@ -125,7 +127,11 @@ export default function GroupsPage() {
                           <td className={styles.rankCell}>{index + 1}</td>
                           <td>
                             <div className={styles.teamCell}>
-                              <span className="flag">{groupTeam.team.flag_emoji}</span>
+                              {getFlagUrl(groupTeam.team.code) ? (
+                                <img src={getFlagUrl(groupTeam.team.code)!} alt={groupTeam.team.code} className="flag" style={{ width: 24, height: 18, objectFit: 'cover', borderRadius: 3, display: 'inline-block' }} />
+                              ) : (
+                                <span className="flag">{groupTeam.team.flag_emoji}</span>
+                              )}
                               <span className={styles.teamName}>
                                 {locale === 'et' ? groupTeam.team.name_et : groupTeam.team.name_en}
                               </span>

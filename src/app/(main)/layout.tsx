@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { I18nProvider } from '@/lib/i18n';
+import { LeagueProvider } from '@/lib/LeagueContext';
 import Header from '@/components/layout/Header';
 import type { Profile, Locale } from '@/lib/types';
 
@@ -75,7 +76,7 @@ export default function MainLayout({
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase, router]);
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -100,19 +101,21 @@ export default function MainLayout({
 
   return (
     <I18nProvider initialLocale={initialLocale}>
-      <Header
-        user={
-          profile
-            ? {
-                display_name: profile.display_name,
-                avatar_url: profile.avatar_url,
-                is_admin: profile.is_admin,
-              }
-            : null
-        }
-        onLogout={handleLogout}
-      />
-      <main className="container page-content">{children}</main>
+      <LeagueProvider>
+        <Header
+          user={
+            profile
+              ? {
+                  display_name: profile.display_name,
+                  avatar_url: profile.avatar_url,
+                  is_admin: profile.is_admin,
+                }
+              : null
+          }
+          onLogout={handleLogout}
+        />
+        <main className="container page-content">{children}</main>
+      </LeagueProvider>
     </I18nProvider>
   );
 }

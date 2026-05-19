@@ -32,12 +32,75 @@ BEGIN
     (t_id, 'I', 9), (t_id, 'J', 10), (t_id, 'K', 11), (t_id, 'L', 12)
     ON CONFLICT (tournament_id, name) DO NOTHING;
 
-    -- We will insert the 48 teams later when the official draw is completed
-    -- For now, let's just insert the host nations
+    -- Insert all 48 teams
     INSERT INTO public.teams (name_et, name_en, code, flag_emoji) VALUES
-    ('Ameerika Ühendriigid', 'United States', 'USA', '🇺🇸'),
+    ('Mehhiko', 'Mexico', 'MEX', '🇲🇽'),
+    ('Lõuna-Aafrika Vabariik', 'South Africa', 'RSA', '🇿🇦'),
+    ('Lõuna-Korea', 'South Korea', 'KOR', '🇰🇷'),
+    ('Tšehhi', 'Czech Republic', 'CZE', '🇨🇿'),
     ('Kanada', 'Canada', 'CAN', '🇨🇦'),
-    ('Mehhiko', 'Mexico', 'MEX', '🇲🇽')
+    ('Bosnia ja Hertsegoviina', 'Bosnia and Herzegovina', 'BIH', '🇧🇦'),
+    ('Katar', 'Qatar', 'QAT', '🇶🇦'),
+    ('Šveits', 'Switzerland', 'SUI', '🇨🇭'),
+    ('Brasiilia', 'Brazil', 'BRA', '🇧🇷'),
+    ('Maroko', 'Morocco', 'MAR', '🇲🇦'),
+    ('Haiti', 'Haiti', 'HAI', '🇭🇹'),
+    ('Šotimaa', 'Scotland', 'SCO', '🏴󠁧󠁢󠁳󠁣󠁴󠁿'),
+    ('Ameerika Ühendriigid', 'United States', 'USA', '🇺🇸'),
+    ('Paraguay', 'Paraguay', 'PAR', '🇵🇾'),
+    ('Austraalia', 'Australia', 'AUS', '🇦🇺'),
+    ('Türgi', 'Turkey', 'TUR', '🇹🇷'),
+    ('Saksamaa', 'Germany', 'GER', '🇩🇪'),
+    ('Curaçao', 'Curaçao', 'CUW', '🇨🇼'),
+    ('Elevandiluurannik', 'Ivory Coast', 'CIV', '🇨🇮'),
+    ('Ecuador', 'Ecuador', 'ECU', '🇪🇨'),
+    ('Holland', 'Netherlands', 'NED', '🇳🇱'),
+    ('Jaapan', 'Japan', 'JPN', '🇯🇵'),
+    ('Rootsi', 'Sweden', 'SWE', '🇸🇪'),
+    ('Tuneesia', 'Tunisia', 'TUN', '🇹🇳'),
+    ('Belgia', 'Belgium', 'BEL', '🇧🇪'),
+    ('Egiptus', 'Egypt', 'EGY', '🇪🇬'),
+    ('Iraan', 'Iran', 'IRN', '🇮🇷'),
+    ('Uus-Meremaa', 'New Zealand', 'NZL', '🇳🇿'),
+    ('Hispaania', 'Spain', 'ESP', '🇪🇸'),
+    ('Roheneemesaared', 'Cape Verde', 'CPV', '🇨🇻'),
+    ('Saudi Araabia', 'Saudi Arabia', 'KSA', '🇸🇦'),
+    ('Uruguay', 'Uruguay', 'URU', '🇺🇾'),
+    ('Prantsusmaa', 'France', 'FRA', '🇫🇷'),
+    ('Senegal', 'Senegal', 'SEN', '🇸🇳'),
+    ('Iraak', 'Iraq', 'IRQ', '🇮🇶'),
+    ('Norra', 'Norway', 'NOR', '🇳🇴'),
+    ('Argentiina', 'Argentina', 'ARG', '🇦🇷'),
+    ('Alžeeria', 'Algeria', 'ALG', '🇩🇿'),
+    ('Austria', 'Austria', 'AUT', '🇦🇹'),
+    ('Jordaania', 'Jordan', 'JOR', '🇯🇴'),
+    ('Portugal', 'Portugal', 'POR', '🇵🇹'),
+    ('Kongo DV', 'DR Congo', 'COD', '🇨🇩'),
+    ('Usbekistan', 'Uzbekistan', 'UZB', '🇺🇿'),
+    ('Kolumbia', 'Colombia', 'COL', '🇨🇴'),
+    ('Inglismaa', 'England', 'ENG', '🏴󠁧󠁢󠁥󠁮󠁧󠁿'),
+    ('Horvaatia', 'Croatia', 'CRO', '🇭🇷'),
+    ('Ghana', 'Ghana', 'GHA', '🇬🇭'),
+    ('Panama', 'Panama', 'PAN', '🇵🇦')
     ON CONFLICT (code) DO NOTHING;
+
+    -- Assign teams to groups
+    INSERT INTO public.group_teams (group_id, team_id)
+    SELECT g.id, t.id
+    FROM public.groups g, public.teams t
+    WHERE g.tournament_id = t_id AND
+      ((g.name = 'A' AND t.code IN ('MEX', 'RSA', 'KOR', 'CZE')) OR
+       (g.name = 'B' AND t.code IN ('CAN', 'BIH', 'QAT', 'SUI')) OR
+       (g.name = 'C' AND t.code IN ('BRA', 'MAR', 'HAI', 'SCO')) OR
+       (g.name = 'D' AND t.code IN ('USA', 'PAR', 'AUS', 'TUR')) OR
+       (g.name = 'E' AND t.code IN ('GER', 'CUW', 'CIV', 'ECU')) OR
+       (g.name = 'F' AND t.code IN ('NED', 'JPN', 'SWE', 'TUN')) OR
+       (g.name = 'G' AND t.code IN ('BEL', 'EGY', 'IRN', 'NZL')) OR
+       (g.name = 'H' AND t.code IN ('ESP', 'CPV', 'KSA', 'URU')) OR
+       (g.name = 'I' AND t.code IN ('FRA', 'SEN', 'IRQ', 'NOR')) OR
+       (g.name = 'J' AND t.code IN ('ARG', 'ALG', 'AUT', 'JOR')) OR
+       (g.name = 'K' AND t.code IN ('POR', 'COD', 'UZB', 'COL')) OR
+       (g.name = 'L' AND t.code IN ('ENG', 'CRO', 'GHA', 'PAN')))
+    ON CONFLICT (group_id, team_id) DO NOTHING;
 
 END $$;

@@ -16,6 +16,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [emailReminders, setEmailReminders] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -44,6 +45,7 @@ export default function RegisterPage() {
         options: {
           data: {
             display_name: displayName,
+            email_reminders_enabled: emailReminders,
           },
         },
       });
@@ -144,6 +146,19 @@ export default function RegisterPage() {
             minLength={6}
             autoComplete="new-password"
           />
+        </div>
+
+        <div className="input-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
+          <input
+            id="register-reminders"
+            type="checkbox"
+            checked={emailReminders}
+            onChange={(e) => setEmailReminders(e.target.checked)}
+            style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+          />
+          <label className="input-label" htmlFor="register-reminders" style={{ margin: 0, cursor: 'pointer', fontWeight: 'normal' }}>
+            Soovin e-mailile meeldetuletust, kui mängu alguseni on 15 minutit ja mul on ennustus tegemata
+          </label>
         </div>
 
         <button

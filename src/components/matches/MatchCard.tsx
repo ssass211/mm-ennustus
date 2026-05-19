@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { useI18n } from '@/lib/i18n';
 import type { MatchWithPrediction } from '@/lib/types';
+import { getFlagUrl } from '@/lib/flags';
+import { getLocalTimeForVenue } from '@/lib/timezones';
 import styles from './MatchCard.module.css';
 
 interface MatchCardProps {
@@ -23,6 +25,8 @@ export default function MatchCard({ match, showPrediction = true }: MatchCardPro
     minute: '2-digit',
   });
 
+  const localVenueTime = getLocalTimeForVenue(matchDate, match.venue);
+
   const isMatchStarted = new Date() > matchDate;
 
   return (
@@ -36,7 +40,7 @@ export default function MatchCard({ match, showPrediction = true }: MatchCardPro
               {match.group && ` • ${t('groups.group')} ${match.group.name}`}
             </span>
             <span className={styles.dateTime}>
-              {formattedDate} • {formattedTime}
+              {formattedDate} • {formattedTime} {localVenueTime && <span style={{ opacity: 0.7, fontSize: '0.9em' }}>({localVenueTime} kohalik)</span>}
             </span>
           </div>
           <div className={styles.status}>
@@ -61,7 +65,11 @@ export default function MatchCard({ match, showPrediction = true }: MatchCardPro
         {/* Teams and Score */}
         <div className={styles.teamsContainer}>
           <div className={styles.team}>
-            <span className={`flag ${styles.flag}`}>{match.home_team.flag_emoji}</span>
+            {getFlagUrl(match.home_team.code) ? (
+              <img src={getFlagUrl(match.home_team.code)!} alt={match.home_team.code} className={`flag ${styles.flag}`} style={{ width: 32, height: 24, objectFit: 'cover', borderRadius: 4 }} />
+            ) : (
+              <span className={`flag ${styles.flag}`}>{match.home_team.flag_emoji}</span>
+            )}
             <span className={styles.teamName}>
               {locale === 'et' ? match.home_team.name_et : match.home_team.name_en}
             </span>
@@ -78,10 +86,14 @@ export default function MatchCard({ match, showPrediction = true }: MatchCardPro
           </div>
 
           <div className={`${styles.team} ${styles.teamRight}`}>
+            {getFlagUrl(match.away_team.code) ? (
+              <img src={getFlagUrl(match.away_team.code)!} alt={match.away_team.code} className={`flag ${styles.flag}`} style={{ width: 32, height: 24, objectFit: 'cover', borderRadius: 4 }} />
+            ) : (
+              <span className={`flag ${styles.flag}`}>{match.away_team.flag_emoji}</span>
+            )}
             <span className={styles.teamName}>
               {locale === 'et' ? match.away_team.name_et : match.away_team.name_en}
             </span>
-            <span className={`flag ${styles.flag}`}>{match.away_team.flag_emoji}</span>
           </div>
         </div>
 

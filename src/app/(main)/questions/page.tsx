@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useI18n } from '@/lib/i18n';
+import { useLeague } from '@/lib/LeagueContext';
 import type { SpecialQuestionWithAnswer } from '@/lib/types';
 import styles from './questions.module.css';
 
@@ -13,9 +14,18 @@ export default function QuestionsPage() {
 
   const [questions, setQuestions] = useState<SpecialQuestionWithAnswer[]>([]);
   const [loading, setLoading] = useState(true);
+  const { activeLeague } = useLeague();
 
   useEffect(() => {
     const fetchQuestions = async () => {
+      if (!activeLeague) {
+        setQuestions([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
@@ -25,6 +35,7 @@ export default function QuestionsPage() {
           *,
           answers:special_question_answers(*)
         `)
+        .eq('league_id', activeLeague.id)
         .order('deadline', { ascending: true });
 
       if (error || !data) {
@@ -47,7 +58,7 @@ export default function QuestionsPage() {
     };
 
     fetchQuestions();
-  }, [supabase]);
+  }, [supabase, activeLeague]);
 
   if (loading) {
     return (
@@ -59,11 +70,18 @@ export default function QuestionsPage() {
 
   return (
     <div>
-      <div className="page-header">
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 className="page-title">{t('questions.title')}</h1>
+        {activeLeague && <span className="badge badge-primary">{activeLeague.name}</span>}
       </div>
 
-      {questions.length === 0 ? (
+      {!activeLeague ? (
+        <div className="empty-state glass-card">
+          <div className="empty-state-icon">❓</div>
+          <div className="empty-state-title">Aktiivne liiga puudub</div>
+          <p>Vali aktiivne liiga, et näha selle liiga eriküsimusi.</p>
+        </div>
+      ) : questions.length === 0 ? (
         <div className="empty-state glass-card">
           <div className="empty-state-icon">❓</div>
           <div className="empty-state-title">Eriküsimusi pole veel lisatud</div>

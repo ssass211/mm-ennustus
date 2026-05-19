@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
+import { useLeague } from '@/lib/LeagueContext';
 import styles from './Header.module.css';
 
 interface HeaderProps {
@@ -17,6 +18,8 @@ interface HeaderProps {
 export default function Header({ user, onLogout }: HeaderProps) {
   const { t, locale, setLocale } = useI18n();
   const pathname = usePathname();
+  const router = useRouter();
+  const { activeLeague, setActiveLeague, userLeagues } = useLeague();
 
   const navItems = [
     { href: '/', label: t('nav.dashboard'), icon: '🏠' },
@@ -77,6 +80,32 @@ export default function Header({ user, onLogout }: HeaderProps) {
             >
               {locale === 'et' ? '🇬🇧' : '🇪🇪'}
             </button>
+
+            {userLeagues.length > 0 && (
+              <select 
+                className="input"
+                value={activeLeague?.id || ''}
+                onChange={(e) => {
+                  const league = userLeagues.find(l => l.league_id === e.target.value)?.leagues;
+                  if (league) setActiveLeague(league as any);
+                }}
+                style={{
+                  padding: '6px 32px 6px 12px',
+                  height: 'auto',
+                  minHeight: '36px',
+                  marginLeft: '12px',
+                  fontSize: '0.9rem',
+                  width: 'auto',
+                  cursor: 'pointer'
+                }}
+              >
+                {userLeagues.map((lm) => (
+                  <option key={lm.league_id} value={lm.league_id} style={{ background: 'var(--surface-100)', color: 'var(--text-primary)', padding: '8px' }}>
+                    {lm.leagues.name}
+                  </option>
+                ))}
+              </select>
+            )}
 
             {user && (
               <div className={styles.userMenu}>

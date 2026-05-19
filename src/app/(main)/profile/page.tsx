@@ -15,6 +15,7 @@ export default function ProfilePage() {
   const [email, setEmail] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [preferredLanguage, setPreferredLanguage] = useState<Locale>(locale);
+  const [emailReminders, setEmailReminders] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -41,6 +42,9 @@ export default function ProfilePage() {
           if (data.preferred_language) {
             setPreferredLanguage(data.preferred_language as Locale);
           }
+          if (data.email_reminders_enabled !== undefined) {
+            setEmailReminders(data.email_reminders_enabled);
+          }
         }
       }
       setLoading(false);
@@ -62,6 +66,7 @@ export default function ProfilePage() {
         .update({
           display_name: displayName,
           preferred_language: preferredLanguage,
+          email_reminders_enabled: emailReminders,
         })
         .eq('id', profile.id);
 
@@ -219,6 +224,19 @@ export default function ProfilePage() {
               <option value="et">Eesti keel 🇪🇪</option>
               <option value="en">English 🇬🇧</option>
             </select>
+          </div>
+
+          <div className="input-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
+            <input
+              id="profile-reminders"
+              type="checkbox"
+              checked={emailReminders}
+              onChange={(e) => setEmailReminders(e.target.checked)}
+              style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+            />
+            <label className="input-label" htmlFor="profile-reminders" style={{ margin: 0, cursor: 'pointer', fontWeight: 'normal' }}>
+              Soovin e-mailile meeldetuletust, kui mängu alguseni on 15 minutit ja mul on ennustus tegemata
+            </label>
           </div>
 
           <div className={styles.formActions}>

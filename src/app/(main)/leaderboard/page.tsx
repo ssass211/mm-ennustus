@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useI18n } from '@/lib/i18n';
+import { useLeague } from '@/lib/LeagueContext';
+import Link from 'next/link';
 import type { LeaderboardEntry } from '@/lib/types';
 
 export default function LeaderboardPage() {
@@ -11,28 +13,39 @@ export default function LeaderboardPage() {
 
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const { activeLeague } = useLeague();
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
-      // Fetch from the SQL view we created in the migration
+      if (!activeLeague) {
+        setLeaderboard([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      
       const { data, error } = await supabase
-        .from('leaderboard_view')
-        .select('*')
-        .order('total_points', { ascending: false })
-        .order('exact_scores', { ascending: false });
+        .rpc('get_league_leaderboard', { p_league_id: activeLeague.id });
 
       if (error || !data) {
         console.error(error);
         setLoading(false);
         return;
       }
+      
+      // Sort by total_points DESC, exact_scores DESC
+      const sortedData = [...data].sort((a, b) => {
+        if (b.total_points !== a.total_points) return b.total_points - a.total_points;
+        return b.exact_scores - a.exact_scores;
+      });
 
       // Add rank considering ties
       let currentRank = 1;
       let prevPoints = -1;
       let prevExact = -1;
 
-      const rankedData = data.map((entry: any, index: number) => {
+      const rankedData = sortedData.map((entry: any, index: number) => {
         if (entry.total_points !== prevPoints || entry.exact_scores !== prevExact) {
           currentRank = index + 1;
         }
@@ -50,7 +63,7 @@ export default function LeaderboardPage() {
     };
 
     fetchLeaderboard();
-  }, [supabase]);
+  }, [supabase, activeLeague]);
 
   if (loading) {
     return (
@@ -71,11 +84,19 @@ export default function LeaderboardPage() {
 
   return (
     <div>
-      <div className="page-header">
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 className="page-title">{t('leaderboard.title')}</h1>
+        {activeLeague && <span className="badge badge-primary">{activeLeague.name}</span>}
       </div>
 
-      <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+      {!activeLeague ? (
+        <div className="empty-state glass-card">
+          <div className="empty-state-icon">🏆</div>
+          <div className="empty-state-title">Aktiivne liiga puudub</div>
+          <p>Edetabeli nägemiseks vali peamenüüst aktiivne liiga või liitu uue liigaga.</p>
+        </div>
+      ) : (
+        <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
         <div className="table-container">
           <table className="w-full text-left">
             <thead>
@@ -110,7 +131,7 @@ export default function LeaderboardPage() {
                     </td>
                     
                     <td className="p-4">
-                      <div className="flex items-center gap-3">
+                      <Link href={`/users/${player.user_id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                         <div className="avatar avatar-sm flex-shrink-0">
                           {player.avatar_url ? (
                             <img src={player.avatar_url} alt={player.display_name} />
@@ -119,7 +140,7 @@ export default function LeaderboardPage() {
                           )}
                         </div>
                         <span className="font-semibold text-primary">{player.display_name}</span>
-                      </div>
+                      </Link>
                     </td>
                     
                     <td className="p-4 text-center hide-mobile text-muted">
@@ -147,7 +168,8 @@ export default function LeaderboardPage() {
             </tbody>
           </table>
         </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { useI18n } from '@/lib/i18n';
+import { I18nProvider } from '@/lib/i18n';
+import { LeagueProvider } from '@/lib/LeagueContext';
 import Header from '@/components/layout/Header';
 import styles from './admin.module.css';
 
@@ -15,7 +16,6 @@ export default function AdminLayout({
 }) {
   const router = useRouter();
   const supabase = createClient();
-  const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<any>(null);
 
@@ -45,7 +45,7 @@ export default function AdminLayout({
     };
 
     checkAdmin();
-  }, [supabase, router]);
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -62,43 +62,45 @@ export default function AdminLayout({
   }
 
   return (
-    <>
-      <Header
-        user={{
-          display_name: userProfile?.display_name || 'Admin',
-          avatar_url: userProfile?.avatar_url || null,
-          is_admin: true,
-        }}
-        onLogout={handleLogout}
-      />
-      
-      <div className={styles.adminContainer}>
-        {/* Admin Sidebar */}
-        <aside className={styles.adminSidebar}>
-          <div className={styles.sidebarHeader}>
-            <h3>⚙️ {t('admin.title')}</h3>
-          </div>
-          <nav className={styles.sidebarNav}>
-            <Link href="/admin" className={styles.sidebarLink}>
-              Avaleht
-            </Link>
-            <Link href="/admin/matches" className={styles.sidebarLink}>
-              Mängude haldus
-            </Link>
-            <Link href="/admin/questions" className={styles.sidebarLink}>
-              Eriküsimused
-            </Link>
-            <Link href="/admin/stages" className={styles.sidebarLink}>
-              Turniiri faasid
-            </Link>
-          </nav>
-        </aside>
+    <I18nProvider initialLocale={userProfile?.preferred_language || 'et'}>
+      <LeagueProvider>
+        <Header
+          user={{
+            display_name: userProfile?.display_name || 'Admin',
+            avatar_url: userProfile?.avatar_url || null,
+            is_admin: true,
+          }}
+          onLogout={handleLogout}
+        />
         
-        {/* Admin Content */}
-        <main className={styles.adminContent}>
-          {children}
-        </main>
-      </div>
-    </>
+        <div className={styles.adminContainer}>
+          {/* Admin Sidebar */}
+          <aside className={styles.adminSidebar}>
+            <div className={styles.sidebarHeader}>
+              <h3>⚙️ Admin paneel</h3>
+            </div>
+            <nav className={styles.sidebarNav}>
+              <Link href="/admin" className={styles.sidebarLink}>
+                Avaleht
+              </Link>
+              <Link href="/admin/matches" className={styles.sidebarLink}>
+                Mängude haldus
+              </Link>
+              <Link href="/admin/questions" className={styles.sidebarLink}>
+                Eriküsimused
+              </Link>
+              <Link href="/admin/stages" className={styles.sidebarLink}>
+                Turniiri faasid
+              </Link>
+            </nav>
+          </aside>
+          
+          {/* Admin Content */}
+          <main className={styles.adminContent}>
+            {children}
+          </main>
+        </div>
+      </LeagueProvider>
+    </I18nProvider>
   );
 }
