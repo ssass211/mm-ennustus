@@ -17,6 +17,8 @@ export default function LeagueAdminPage({ params }: { params: Promise<{ id: stri
   const [questions, setQuestions] = useState<any[]>([]);
   const [newQuestion, setNewQuestion] = useState({ question_et: '', question_en: '', max_points: 5, deadline: '' });
 
+  const currentLeague = userLeagues.find(l => l.league_id === id);
+
   // Verify admin access
   useEffect(() => {
     const isLeagueAdmin = userLeagues.some(l => l.league_id === id && l.role === 'admin');
@@ -72,8 +74,13 @@ export default function LeagueAdminPage({ params }: { params: Promise<{ id: stri
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
-        <h1 className="page-title mb-0">Liiga Administraator</h1>
-        <Link href="/leagues" className="btn btn-secondary">Tagasi</Link>
+        <div>
+          <h1 className="page-title mb-0">Liiga Administraator</h1>
+          {currentLeague && (
+            <p className="text-muted mt-2">Liitumiskood: <strong className="text-white text-lg px-2 py-1 bg-surface-200 rounded">{currentLeague.leagues.join_code}</strong></p>
+          )}
+        </div>
+        <Link href="/" className="btn btn-secondary">Tagasi avalehele</Link>
       </div>
 
       <div className={styles.adminCard + " mb-8"}>

@@ -136,12 +136,12 @@ export default function DashboardPage() {
         </div>
       ) : (
         <>
-          <div className="mb-6 flex gap-2 flex-wrap items-center">
+          <div className="mb-10 flex gap-2 flex-wrap items-center">
             <span className="text-sm font-semibold text-muted mr-2">Aktiivne liiga:</span>
             {userLeagues.map(lm => (
               <button 
                 key={lm.league_id} 
-                className={`badge ${activeLeague?.id === lm.league_id ? 'badge-primary' : 'badge-outline cursor-pointer hover:bg-surface-200'}`}
+                className={`badge ${activeLeague?.id === lm.league_id ? 'bg-primary text-white font-bold' : 'badge-outline cursor-pointer hover:bg-surface-200'}`}
                 onClick={() => setActiveLeague(lm.leagues as any)}
                 style={{ padding: '8px 16px', fontSize: '1rem' }}
               >
@@ -153,17 +153,8 @@ export default function DashboardPage() {
               onClick={() => setShowLeagueManager(!showLeagueManager)}
               style={{ padding: '8px 16px', fontSize: '1rem', borderStyle: 'dashed', borderColor: 'var(--text-muted)' }}
             >
-              + Lisa liiga
+              {showLeagueManager ? 'Sulge' : '+ Lisa või halda liigat'}
             </button>
-            {userLeagues.find(lm => lm.league_id === activeLeague?.id)?.role === 'admin' && (
-              <Link
-                href={`/leagues/${activeLeague!.id}/admin`}
-                className="badge badge-outline cursor-pointer hover:bg-surface-200"
-                style={{ padding: '8px 16px', fontSize: '1rem', borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
-              >
-                ⚙️ Liiga seaded
-              </Link>
-            )}
           </div>
 
           {(showLeagueManager) && (
